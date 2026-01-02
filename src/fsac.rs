@@ -114,27 +114,17 @@ fn get_fsac_tmfs_path(version: &String) -> zed::Result<Vec<Version>> {
 }
 
 fn select_compatible_tmfs(
-    dotnet_version: &Version,
+    _dotnet_version: &Version,
     available_versions: &Vec<Version>,
 ) -> zed::Result<String> {
-    let mut compatible_versions: Vec<&Version> = available_versions
-        .iter()
-        .filter(|v| v.major <= dotnet_version.major)
-        .collect();
-
-    compatible_versions.sort();
-
-    if let Some(selected_version) = compatible_versions.last() {
+    if let Some(max_version) = available_versions.iter().max() {
         println!(
-            "Selected Target Framework Moniker: net{}.0",
-            selected_version.major
+            "Selected FSAC TFM: net{}.0 (ignoring SDK version)",
+            max_version.major
         );
-        Ok(format!("net{}.0", selected_version.major))
+        Ok(format!("net{}.0", max_version.major))
     } else {
-        zed::Result::Err(format!(
-            "No compatible Target Framework Monikers found for dotnet version {}",
-            dotnet_version
-        ))
+        zed::Result::Err("No Target Framework Monikers found in fsautocomplete tools".to_string())
     }
 }
 
